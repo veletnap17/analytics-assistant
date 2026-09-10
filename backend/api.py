@@ -10,7 +10,14 @@ from src.services.source_router import detect_source
 from src.services.chat_history_service import save_message, load_session, get_last_sql
 from src.agents.fleet_agent import handle_fleet_question
 from src.services.kpi_service import get_kpis
-from src.services.chat_history_service import get_sessions, load_session
+from src.services.chat_history_service import (
+    save_message,
+    load_session,
+    get_last_sql,
+    get_sessions,
+    set_chat_title,
+)
+from src.services.chat_title_service import generate_chat_title
 from io import BytesIO
 from fastapi.responses import StreamingResponse
 from openpyxl import Workbook
@@ -62,14 +69,21 @@ def kpis():
 
 @app.post("/chat")
 def chat(request: ChatRequest):
+    is_new_session = request.session_id is None
     session_id = request.session_id or str(uuid.uuid4())
+
     history = [
         {"role": m["role"], "content": m["content"]}
         for m in load_session(session_id)
     ]
+
     previous_sql = get_last_sql(session_id)
 
     save_message(session_id, "user", request.question)
+
+    if is_new_session:
+        title = generate_chat_title(request.question)
+        set_chat_title(session_id, title)
     source = detect_source(request.question)
 
     if source == "fleet":

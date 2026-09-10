@@ -14,63 +14,144 @@ def get_chat_connection():
         password=os.getenv("CHAT_DB_PASSWORD")
     )
 
-def save_message(session_id: str, role: str, content: str, sql_text: str | None = None, data_json=None):
+def save_message(
+    session_id: str,
+    role: str,
+    content: str,
+    sql_text: str | None = None,
+    data_json=None
+):
     conn = get_chat_connection()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO chat_history (session_id, role, content, sql_text, data_json)
+                INSERT INTO chat_history (
+                    session_id,
+                    role,
+                    content,
+                    sql_text,
+                    data_json
+                )
                 VALUES (%s, %s, %s, %s, %s)
-            """, (session_id, role, content, sql_text, Json(data_json) if data_json is not None else None))
+            """, (
+                session_id,
+                role,
+                content,
+                sql_text,
+                Json(data_json) if data_json is not None else None
+            ))
+
         conn.commit()
+
+    finally:
+        conn.close()
+
+def set_chat_title(session_id: str, title: str):
+    conn = get_chat_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                UPDATE chat_history
+                SET chat_title = %s
+                WHERE id = (
+                    SELECT id
+                    FROM chat_history
+                    WHERE session_id = %s
+                      AND role = 'user'
+                    ORDER BY created_at
+                    LIMIT 1
+                )
+            """, (title, session_id))
+
+        conn.commit()
+
     finally:
         conn.close()
 
 def get_sessions():
     conn = get_chat_connection()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT DISTINCT ON (session_id)
-                    session_id, content AS title, created_at
-                FROM chat_history
-                WHERE role = 'user'
-                ORDER BY session_id, created_at
+                SELECT DISTINCT ON (h.session_id)
+                    h.session_id,
+                    COALESCE(
+                        (
+                            SELECT t.chat_title
+                            FROM chat_history t
+                            WHERE t.session_id = h.session_id
+                              AND t.chat_title IS NOT NULL
+                            ORDER BY t.created_at
+                            LIMIT 1
+                        ),
+                        h.content
+                    ) AS title,
+                    h.created_at
+                FROM chat_history h
+                WHERE h.role = 'user'
+                ORDER BY h.session_id, h.created_at
             """)
+
             rows = cursor.fetchall()
-            return sorted(rows, key=lambda x: x[2], reverse=True)
+
+            return sorted(
+                rows,
+                key=lambda x: x[2],
+                reverse=True
+            )
+
     finally:
         conn.close()
 
 def load_session(session_id: str):
     conn = get_chat_connection()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT role, content, sql_text, data_json
+                SELECT
+                    role,
+                    content,
+                    sql_text,
+                    data_json
                 FROM chat_history
                 WHERE session_id = %s
                 ORDER BY created_at
             """, (session_id,))
+
             return [
-                {"role": role, "content": content, "sql": sql, "data": data}
+                {
+                    "role": role,
+                    "content": content,
+                    "sql": sql,
+                    "data": data
+                }
                 for role, content, sql, data in cursor.fetchall()
             ]
+
     finally:
         conn.close()
 
 def get_last_sql(session_id: str):
     conn = get_chat_connection()
+
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
                 SELECT sql_text
                 FROM chat_history
-                WHERE session_id = %s AND sql_text IS NOT NULL
+                WHERE session_id = %s
+                  AND sql_text IS NOT NULL
                 ORDER BY created_at DESC
                 LIMIT 1
             """, (session_id,))
+
             row = cursor.fetchone()
+
             return row[0] if row else None
+
     finally:
         conn.close()

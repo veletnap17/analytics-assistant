@@ -1,4 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  Plus,
+  MessageSquare,
+  Send,
+  Download,
+  Database,
+  Sparkles
+} from "lucide-react";
 import ResultChart from "./components/ResultChart";
 import "./index.css";
 
@@ -56,9 +64,7 @@ function ResultTable({ data }) {
         <thead>
           <tr>
             {columns.map(column => (
-              <th key={column}>
-                {column.replaceAll("_", " ")}
-              </th>
+              <th key={column}>{column.replaceAll("_", " ")}</th>
             ))}
           </tr>
         </thead>
@@ -67,9 +73,7 @@ function ResultTable({ data }) {
           {data.map((row, index) => (
             <tr key={index}>
               {columns.map(column => (
-                <td key={column}>
-                  {formatValue(row[column], column)}
-                </td>
+                <td key={column}>{formatValue(row[column], column)}</td>
               ))}
             </tr>
           ))}
@@ -132,7 +136,11 @@ function App() {
 
   async function loadSessions() {
     const response = await fetch(`${API}/sessions`);
-    if (!response.ok) throw new Error("Could not load sessions");
+
+    if (!response.ok) {
+      throw new Error("Could not load sessions");
+    }
+
     setSessions(await response.json());
   }
 
@@ -155,7 +163,10 @@ function App() {
   async function openSession(id) {
     try {
       const response = await fetch(`${API}/sessions/${id}`);
-      if (!response.ok) throw new Error("Could not load chat");
+
+      if (!response.ok) {
+        throw new Error("Could not load chat");
+      }
 
       const result = await response.json();
 
@@ -168,11 +179,15 @@ function App() {
 
   async function sendQuestion(text = question) {
     const cleanQuestion = text.trim();
+
     if (!cleanQuestion || loading) return;
 
     setMessages(prev => [
       ...prev,
-      { role: "user", content: cleanQuestion }
+      {
+        role: "user",
+        content: cleanQuestion
+      }
     ]);
 
     setQuestion("");
@@ -181,7 +196,9 @@ function App() {
     try {
       const response = await fetch(`${API}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           question: cleanQuestion,
           session_id: sessionId
@@ -238,22 +255,25 @@ function App() {
     <div className="app">
       <aside className="sidebar">
         <div className="logo">
-          <div className="logoBox">
-            any<br />time
-          </div>
+          <img
+            src="/anytime-logo.png"
+            alt="Anytime"
+            className="logoImage"
+          />
 
           <span>
-            Anytime<br />Analytics
+            Anytime
+            <br />
+            Analytics
           </span>
         </div>
 
         <button className="newChat" onClick={newChat}>
-          ＋ New chat
+          <Plus size={18} strokeWidth={2.2} />
+          <span>New chat</span>
         </button>
 
-        <p className="sectionTitle">
-          Recent conversations
-        </p>
+        <p className="sectionTitle">Recent conversations</p>
 
         <div className="chats">
           {sessions.slice(0, 10).map(session => (
@@ -267,7 +287,8 @@ function App() {
               onClick={() => openSession(session.session_id)}
               title={session.title}
             >
-              {session.title}
+              <MessageSquare size={16} />
+              <span>{session.title}</span>
             </button>
           ))}
         </div>
@@ -344,7 +365,12 @@ function App() {
         <section className="conversation">
           {messages.length === 0 && (
             <div className="answer">
+              <div className="emptyIcon">
+                <Sparkles size={22} />
+              </div>
+
               <h3>What would you like to know?</h3>
+
               <p>
                 Ask a question about rides, revenue, customers
                 or the current fleet.
@@ -374,14 +400,16 @@ function App() {
                     className="downloadButton"
                     onClick={() => downloadExcel(message.data)}
                   >
-                    ↓ Download Excel
+                    <Download size={16} />
+                    <span>Download Excel</span>
                   </button>
                 )}
 
                 {message.sql && (
                   <details className="technical">
                     <summary>
-                      View SQL query
+                      <Database size={15} />
+                      <span>View SQL query</span>
                     </summary>
 
                     <pre>
@@ -396,9 +424,7 @@ function App() {
                       (suggestion, suggestionIndex) => (
                         <button
                           key={suggestionIndex}
-                          onClick={() =>
-                            sendQuestion(suggestion)
-                          }
+                          onClick={() => sendQuestion(suggestion)}
                           disabled={loading}
                         >
                           {suggestion}
@@ -418,6 +444,7 @@ function App() {
                 <span />
                 <span />
               </div>
+
               <span>Analyzing</span>
             </div>
           )}
@@ -425,24 +452,16 @@ function App() {
           <div ref={bottomRef} />
         </section>
 
-        <form
-          className="inputBar"
-          onSubmit={submit}
-        >
+        <form className="inputBar" onSubmit={submit}>
           <input
             value={question}
-            onChange={event =>
-              setQuestion(event.target.value)
-            }
+            onChange={event => setQuestion(event.target.value)}
             placeholder="Ask your analytics question..."
             disabled={loading}
           />
 
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            ➤
+          <button type="submit" disabled={loading}>
+            <Send size={20} />
           </button>
         </form>
       </main>
