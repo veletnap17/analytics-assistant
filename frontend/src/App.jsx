@@ -5,7 +5,10 @@ import {
   Send,
   Download,
   Database,
-  Sparkles
+  Sparkles,
+  MoreHorizontal,
+  Trash2,
+  Pencil
 } from "lucide-react";
 import ResultChart from "./components/ResultChart";
 import "./index.css";
@@ -131,6 +134,7 @@ function App() {
   const [sessions, setSessions] = useState([]);
   const [kpis, setKpis] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [openMenu, setOpenMenu] = useState(null);
 
   const bottomRef = useRef(null);
 
@@ -142,6 +146,55 @@ function App() {
     }
 
     setSessions(await response.json());
+  }
+  async function deleteChat(id) {
+    const confirmed = window.confirm("Delete this chat?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`${API}/sessions/${id}`, {
+        method: "DELETE"
+      });
+
+      if (!response.ok) throw new Error("Could not delete chat");
+
+      if (sessionId === id) {
+        setSessionId(null);
+        setMessages([]);
+      }
+
+      setOpenMenu(null);
+      await loadSessions();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async function renameChat(id, currentTitle) {
+    const title = window.prompt("Rename chat", currentTitle);
+
+    if (!title?.trim() || title.trim() === currentTitle) {
+      setOpenMenu(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API}/sessions/${id}/title`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          title: title.trim()
+        })
+      });
+
+      if (!response.ok) throw new Error("Could not rename chat");
+
+      setOpenMenu(null);
+      await loadSessions();
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {
@@ -277,19 +330,59 @@ function App() {
 
         <div className="chats">
           {sessions.slice(0, 10).map(session => (
-            <button
-              key={session.session_id}
-              className={
-                session.session_id === sessionId
-                  ? "chat active"
-                  : "chat"
-              }
-              onClick={() => openSession(session.session_id)}
-              title={session.title}
-            >
-              <MessageSquare size={16} />
-              <span>{session.title}</span>
-            </button>
+            <div className="chatRow" key={session.session_id}>
+              <button
+                className={
+                  session.session_id === sessionId
+                    ? "chat active"
+                    : "chat"
+                }
+                onClick={() => {
+                  openSession(session.session_id);
+                  setOpenMenu(null);
+                }}
+                title={session.title}
+              >
+                <MessageSquare size={16} />
+                <span>{session.title}</span>
+              </button>
+
+              <button
+                className="chatMenuButton"
+                onClick={event => {
+                  event.stopPropagation();
+                  setOpenMenu(
+                    openMenu === session.session_id
+                      ? null
+                      : session.session_id
+                  );
+                }}
+                title="Chat options"
+              >
+                <MoreHorizontal size={17} />
+              </button>
+
+              {openMenu === session.session_id && (
+                <div className="chatMenu">
+                  <button
+                    className="renameChatButton"
+                    onClick={() =>
+                      renameChat(session.session_id, session.title)
+                    }
+                  >
+                    <Pencil size={15} />
+                    <span>Rename chat</span>
+                  </button>
+
+                  <button
+                    onClick={() => deleteChat(session.session_id)}
+                  >
+                    <Trash2 size={15} />
+                    <span>Delete chat</span>
+                  </button>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </aside>

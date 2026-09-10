@@ -155,3 +155,18 @@ def get_last_sql(session_id: str):
 
     finally:
         conn.close()
+
+def delete_session(session_id: str):
+    conn = get_chat_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM chat_history
+                WHERE session_id = %s
+            """, (session_id,))
+
+        conn.commit()
+
+    finally:
+        conn.close()

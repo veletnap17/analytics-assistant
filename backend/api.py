@@ -16,6 +16,7 @@ from src.services.chat_history_service import (
     get_last_sql,
     get_sessions,
     set_chat_title,
+    delete_session,
 )
 from src.services.chat_title_service import generate_chat_title
 from io import BytesIO
@@ -40,6 +41,9 @@ class ChatRequest(BaseModel):
     question: str
     session_id: str | None = None
 
+class RenameChatRequest(BaseModel):
+    title: str
+
 class ExportRequest(BaseModel):
     data: list[dict]
     filename: str = "anytime-analytics.xlsx"
@@ -58,6 +62,25 @@ def session(session_id: str):
         "session_id": session_id,
         "messages": load_session(session_id)
     })
+
+@app.delete("/sessions/{session_id}")
+def delete_chat(session_id: str):
+    delete_session(session_id)
+
+    return {
+        "status": "deleted",
+        "session_id": session_id
+    }
+
+@app.put("/sessions/{session_id}/title")
+def rename_chat(session_id: str, request: RenameChatRequest):
+    set_chat_title(session_id, request.title.strip())
+
+    return {
+        "status": "updated",
+        "session_id": session_id,
+        "title": request.title.strip()
+    }
 
 @app.get("/health")
 def health():
