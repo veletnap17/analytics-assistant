@@ -17,3 +17,22 @@ The fleet sheet contains historical daily fleet values.
 Use the latest available row by `Date`.
 
 Current fleet size is stored in the `Total Fleet` column.
+
+## Car models in analytics
+
+Google Sheets is authoritative only for current fleet counts and current fleet composition.
+
+For analytical metrics grouped by car model, such as:
+- revenue by model
+- rides by model
+- users by model
+- average revenue by model
+- historical model performance
+
+use PostgreSQL.
+
+Vehicle model information for SQL analytics comes from:
+
+`Order -> car -> carmodel`
+
+Use `carmodel.displayname` as the human-readable model name.

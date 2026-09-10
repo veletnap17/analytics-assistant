@@ -47,14 +47,14 @@ def load_session(session_id: str):
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT role, content, data_json
+                SELECT role, content, sql_text, data_json
                 FROM chat_history
                 WHERE session_id = %s
                 ORDER BY created_at
             """, (session_id,))
             return [
-                {"role": role, "content": content, "data": data}
-                for role, content, data in cursor.fetchall()
+                {"role": role, "content": content, "sql": sql, "data": data}
+                for role, content, sql, data in cursor.fetchall()
             ]
     finally:
         conn.close()

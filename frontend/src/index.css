@@ -1,0 +1,429 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  color: #07133f;
+  background: #f6fbfc;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 280px;
+  background: #fff;
+  border-right: 1px solid #e5eeee;
+  padding: 28px 20px;
+  position: fixed;
+  inset: 0 auto 0 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-weight: 800;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.logoBox {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #18e5d3, #9af9f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 13px;
+  font-weight: 900;
+}
+
+.newChat {
+  width: 100%;
+  background: #07133f;
+  color: #fff;
+  border: 0;
+  border-radius: 13px;
+  padding: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  color: #718096;
+  margin: 30px 8px 12px;
+}
+
+.chats {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.chat {
+  border: 0;
+  background: transparent;
+  color: #07133f;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat:hover,
+.chat.active {
+  background: #dffffb;
+}
+
+/* Main */
+
+.main {
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  padding: 38px 50px 120px;
+  background:
+    radial-gradient(
+      circle at 65% 0%,
+      rgba(31, 226, 208, 0.14),
+      transparent 30%
+    ),
+    #f6fbfc;
+}
+
+/* Header */
+
+header h1 {
+  margin: 0;
+  font-size: 36px;
+  letter-spacing: -1px;
+}
+
+header p {
+  margin: 7px 0 28px;
+  color: #718096;
+}
+
+/* KPI cards */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.kpi {
+  background: #fff;
+  border: 1px solid #e5eeee;
+  border-radius: 17px;
+  padding: 19px 21px;
+  box-shadow: 0 8px 25px rgba(7, 19, 63, 0.04);
+}
+
+.kpi span {
+  font-size: 13px;
+  color: #667085;
+}
+
+.kpi strong {
+  display: block;
+  font-size: 27px;
+  margin: 9px 0 6px;
+}
+
+.kpi small {
+  color: #00aa82;
+}
+
+.kpi .positive {
+  color: #00aa82;
+}
+
+.kpi .negative {
+  color: #e5484d;
+}
+
+/* Conversation */
+
+.conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.userMessage {
+  align-self: flex-end;
+  background: #dffffb;
+  padding: 16px 20px;
+  border-radius: 17px;
+  max-width: 650px;
+}
+
+.answer {
+  background: #fff;
+  border: 1px solid #e5eeee;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 30px rgba(7, 19, 63, 0.04);
+}
+
+/* Results */
+
+.resultGrid {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+/* Table */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e5eeee;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 13px;
+  text-align: left;
+  border-bottom: 1px solid #e5eeee;
+}
+
+th {
+  background: #f3f7f8;
+  font-size: 13px;
+}
+
+/* Chart */
+
+.chart {
+  border: 1px solid #e5eeee;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.chart h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.bars {
+  height: 190px;
+  display: flex;
+  align-items: flex-end;
+  gap: 25px;
+  padding: 20px 20px 0;
+}
+
+.bars div {
+  flex: 1;
+  min-height: 25px;
+  background: linear-gradient(#19e6d8, #58e7dc);
+  border-radius: 6px 6px 0 0;
+}
+
+/* SQL details */
+
+.technical {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #e5eeee;
+  border-radius: 11px;
+  color: #07133f;
+}
+
+/* Suggestions */
+
+.suggestions {
+  display: flex;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.suggestions button {
+  background: #fff;
+  border: 1px solid #e1eaec;
+  border-radius: 30px;
+  padding: 11px 17px;
+  color: #07133f;
+}
+
+/* Chat input */
+
+.inputBar {
+  position: fixed;
+  bottom: 20px;
+  left: 330px;
+  right: 50px;
+  background: #fff;
+  border: 1.5px solid #19e6d8;
+  border-radius: 16px;
+  padding: 8px;
+  display: flex;
+  box-shadow: 0 8px 30px rgba(7, 19, 63, 0.08);
+}
+
+.inputBar input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  padding: 9px 14px;
+  color: #07133f;
+}
+
+.inputBar button {
+  width: 48px;
+  border: 0;
+  border-radius: 11px;
+  background: #07133f;
+  color: #fff;
+  font-size: 18px;
+}
+
+/* Responsive */
+
+@media (max-width: 1000px) {
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    margin-left: 0;
+    width: 100%;
+    padding: 25px 20px 110px;
+  }
+
+  .inputBar {
+    left: 20px;
+    right: 20px;
+  }
+
+  .kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+.downloadButton {
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: #dffffb;
+  color: #07133f;
+  border: 1px solid #19e6d8;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.downloadButton:hover {
+  background: #19e6d8;
+}
+
+.resultChart {
+  margin-top: 18px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e5eeee;
+  border-radius: 14px;
+}
+
+.resultChart h3 {
+  margin: 0 0 18px;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.messageSuggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.messageSuggestions button {
+  background: #fff;
+  color: #07133f;
+  border: 1px solid #dce8ea;
+  border-radius: 24px;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.messageSuggestions button:hover {
+  background: #dffffb;
+  border-color: #19e6d8;
+}
+
+.loadingAnswer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+}
+
+.typingDots {
+  display: flex;
+  gap: 5px;
+}
+
+.typingDots span {
+  width: 8px;
+  height: 8px;
+  background: #19e6d8;
+  border-radius: 50%;
+  animation: typing 1.2s infinite ease-in-out;
+}
+
+.typingDots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.typingDots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
