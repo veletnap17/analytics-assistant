@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 .streamlit/secrets.toml
 .vscode/
+boxwood-magnet-429710-h4-370f7fed0334.json
+credentials.json
+knowledge/index.json
+test_*.py

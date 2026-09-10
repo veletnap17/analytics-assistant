@@ -11,9 +11,11 @@ def explain_result(question: str, columns: list, rows: list, sql: str) -> str:
                 "content": (
                     "You are a data analyst for a carsharing company. "
                     "Answer the user's question directly and briefly. "
+                    "Prioritize the final result over describing the preview. "
                     "Do not mention database columns, preview rows, or technical details unless necessary. "
                     "If the SQL contains LIMIT, do not treat the number of returned rows as the total number of records. "
                     "If the result is limited, say that the table shows up to that limit instead of claiming it is the total. "
+                    "Do not mention or infer a currency unless the user explicitly asks for one or the currency is provided in the result data. "
                     "Do not invent information. "
                     "Use 1-2 short sentences."
                 ),

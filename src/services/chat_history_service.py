@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from psycopg2.extras import Json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,14 +14,14 @@ def get_chat_connection():
         password=os.getenv("CHAT_DB_PASSWORD")
     )
 
-def save_message(session_id: str, role: str, content: str, sql_text: str | None = None):
+def save_message(session_id: str, role: str, content: str, sql_text: str | None = None, data_json=None):
     conn = get_chat_connection()
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO chat_history (session_id, role, content, sql_text)
-                VALUES (%s, %s, %s, %s)
-            """, (session_id, role, content, sql_text))
+                INSERT INTO chat_history (session_id, role, content, sql_text, data_json)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (session_id, role, content, sql_text, Json(data_json) if data_json is not None else None))
         conn.commit()
     finally:
         conn.close()
@@ -31,9 +32,7 @@ def get_sessions():
         with conn.cursor() as cursor:
             cursor.execute("""
                 SELECT DISTINCT ON (session_id)
-                    session_id,
-                    content AS title,
-                    created_at
+                    session_id, content AS title, created_at
                 FROM chat_history
                 WHERE role = 'user'
                 ORDER BY session_id, created_at
@@ -48,12 +47,15 @@ def load_session(session_id: str):
     try:
         with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT role, content
+                SELECT role, content, data_json
                 FROM chat_history
                 WHERE session_id = %s
                 ORDER BY created_at
             """, (session_id,))
-            return [{"role": role, "content": content} for role, content in cursor.fetchall()]
+            return [
+                {"role": role, "content": content, "data": data}
+                for role, content, data in cursor.fetchall()
+            ]
     finally:
         conn.close()
 

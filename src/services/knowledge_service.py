@@ -1,26 +1,19 @@
+import json
 from pathlib import Path
+from src.services.embedding_service import embed, cosine_similarity
 
 class KnowledgeService:
     def __init__(self):
-        self.base_path = Path("knowledge")
+        self.index_path = Path("knowledge/index.json")
 
-    def load(self, relative_path: str) -> str:
-        return (self.base_path / relative_path).read_text(encoding="utf-8")
+    def search(self, query: str, top_k: int = 3) -> list[str]:
+        index = json.loads(self.index_path.read_text(encoding="utf-8"))
+        query_embedding = embed(query)
 
-    def search(self, query: str) -> list[str]:
-        words = query.lower().split()
-        matches = []
+        results = [
+            (cosine_similarity(query_embedding, item["embedding"]), item["text"])
+            for item in index
+        ]
 
-        for path in self.base_path.rglob("*.md"):
-            text = path.read_text(encoding="utf-8")
-            text_lower = text.lower()
-
-            for word in words:
-                word = word.strip(".,?!")
-                variants = {word, word[:-1]} if word.endswith("s") and len(word) > 3 else {word}
-
-                if any(v in text_lower for v in variants):
-                    matches.append(text)
-                    break
-
-        return matches
+        results.sort(key=lambda x: x[0], reverse=True)
+        return [text for _, text in results[:top_k]]
